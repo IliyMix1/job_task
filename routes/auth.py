@@ -63,5 +63,9 @@ async def login(schema: AuthLogin, session: AsyncSession = Depends(get_session))
     if not is_correct:
         raise HTTPException(status_code=401, detail='Wrong password, please try again')
     
+    if not user.is_active:
+        raise HTTPException(status_code=403, detail='Account was deleted') 
+
+
     token = create_access_token({'sub': str(user.user_id)})
     return {'access_token': token, 'token_type': 'bearer'}
