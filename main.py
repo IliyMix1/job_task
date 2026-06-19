@@ -4,7 +4,7 @@ import uvicorn
 
 #Импортируем роутеры
 from routes.common import common_router
-
+from routes.auth   import auth_router
 
 #Создаём объект класса
 app = FastAPI()
@@ -12,7 +12,7 @@ app = FastAPI()
 
 #Добавляем все роутеры
 app.include_router(common_router)
-
+app.include_router(auth_router)
 
 #Поднимаем сервер
 if __name__ == '__main__':

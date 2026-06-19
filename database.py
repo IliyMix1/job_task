@@ -20,3 +20,15 @@ async def get_session():
     #Создаём асинхронную сессию и кладём её в переменную(with - гарантирует, что она сама закроется после работы с сессией)
     async with async_session() as session:
         yield session
+
+async def create_record(model, schema, session: AsyncSession):
+    #Создаём экземля модели в оперативной памяти
+    new_record = model(**schema.model_dump()) #Превращаем Pydantic-схему в обычный dict и распаковываем его
+
+    session.add(new_record)
+    #Сохраняем изменения в БД
+    await session.commit()
+    #Достаём новую запись из БД и кладём её в new_record
+    await session.refresh(new_record)
+
+    return new_record
