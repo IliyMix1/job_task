@@ -18,7 +18,6 @@ class AuthReg(BaseModel):
             raise ValueError('Пароли не совпадают')
         return self
 
-
 class AuthCreateAccount(BaseModel):
     role_id:    int  
     first_name: str
@@ -26,3 +25,7 @@ class AuthCreateAccount(BaseModel):
     patronymic: str | None = None
     email:      str
     hashed_password: str 
+
+class AuthLogin(BaseModel):
+    email:    str = Field(min_length=1, max_length=320)
+    password: str = Field(min_length=8, max_length=70)
