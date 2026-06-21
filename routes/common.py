@@ -1,6 +1,6 @@
 #Для эндпоинтов
 from fastapi                import APIRouter, Depends, HTTPException
-from schemas                import AuthReg, AuthLogin, ReadProfile, PatchProfile, AdminPatchUser
+from schemas                import AuthReg, AuthLogin, ReadProfile, PatchProfile, AdminPatchUser, AdminReadUser
 #Для интеграции с PostgreSQL
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm         import joinedload
@@ -10,7 +10,7 @@ from models                 import User
 from dependencies           import get_current_user
 
 from auth                   import verify_password, hash_password, create_access_token
-from permissions            import can_read_own_profile, can_update_own_profile, can_delete_own_profile, can_read_all_products, can_create_products, can_read_all_users, can_update_all_users
+from permissions            import can_read_own_profile, can_update_own_profile, can_delete_own_profile, can_read_all_products, can_create_products, can_read_all_users, can_update_all_users, can_delete_all_users
 
 common_router = APIRouter()
 
@@ -51,7 +51,7 @@ async def delete_profile(session: AsyncSession = Depends(get_session), user = De
 #     pass
 
 
-@common_router.get('/admin/users', response_model=list[ReadProfile], tags=['Admin'])
+@common_router.get('/admin/users', response_model=list[AdminReadUser], tags=['Admin'])
 async def get_all_users(user = Depends(can_read_all_users), session: AsyncSession = Depends(get_session)):
     result = await session.execute(
         select(User)
@@ -59,6 +59,19 @@ async def get_all_users(user = Depends(can_read_all_users), session: AsyncSessio
     users = result.scalars().all()
     return users
 
-@common_router.patch('/admin/users/{user_id}', response_model=ReadProfile, tags=['Admin'])
+@common_router.patch('/admin/users/{user_id}', response_model=AdminReadUser, tags=['Admin'])
 async def patch_user(user_id: int, schema: AdminPatchUser, user = Depends(can_update_all_users), session: AsyncSession = Depends(get_session)):
     return await patch_record(id=user_id, model=User, schema=schema, session=session)
+
+@common_router.delete('/admin/users/{user_id}', tags=['Admin'])
+async def delete_user(user_id: int, admin = Depends(can_delete_all_users), session: AsyncSession = Depends(get_session)):
+    result = await session.execute(
+        select(User).where(User.user_id == user_id)
+    )
+    user = result.scalar_one_or_none()
+    if user is None:
+        raise HTTPException(status_code=404, detail='User not found')
+    
+    user.is_active = False
+    await session.commit()
+    return {'message': f'User {user_id} was deleted'}

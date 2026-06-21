@@ -45,6 +45,17 @@ ACCESS_RULES = (
         'can_delete_own': True,
         'can_delete_all': False
     },
+    {
+        'role':     'admin',
+        'resource': 'profile',
+        'can_create':     True,
+        'can_read_own':   True,
+        'can_read_all':   True,
+        'can_update_own': True,
+        'can_update_all': True,
+        'can_delete_own': True,
+        'can_delete_all': True
+    },
     #ПРОДУКТЫ
     {
         'role':     'admin',

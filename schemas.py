@@ -36,7 +36,6 @@ class AuthLogout(BaseModel):
 
 
 class ReadProfile(BaseModel):
-    role_id:      int
     first_name:   str
     last_name:    str 
     patronymic:   str | None
@@ -50,6 +49,7 @@ class PatchProfile(BaseModel):
     email:        str | None = None
     phone_number: str | None = None
 
+
 class AdminPatchUser(BaseModel):
     role_id:      int | None = None
     first_name:   str | None = None
@@ -57,3 +57,13 @@ class AdminPatchUser(BaseModel):
     patronymic:   str | None = None
     email:        str | None = None
     phone_number: str | None = None
+
+class AdminReadUser(BaseModel):
+    user_id:      int
+    role_id:      int
+    first_name:   str
+    last_name:    str 
+    patronymic:   str | None
+    email:        str
+    phone_number: str | None
+    is_active:    bool
