@@ -1,14 +1,16 @@
 #Для эндпоинтов
 from fastapi                import APIRouter, Depends, HTTPException
-#rom schemas.schemas        import AuthReg, AuthLogin, AuthUserCreate, AuthStudentCreate
+from schemas                import AuthReg, AuthLogin, ReadProfile
 #Для интеграции с PostgreSQL
-#from sqlalchemy.ext.asyncio import AsyncSession
-#from sqlalchemy.orm         import joinedload
-#from sqlalchemy             import select
-#from database               import get_session, select_record, create_record
-#from models.models          import User, Student
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm         import joinedload
+from sqlalchemy             import select
+from database               import get_session, create_record
+from models                 import User
+from dependencies           import get_current_user
 
-#from auth                   import verify_password, hash_password, create_access_token
+from auth                   import verify_password, hash_password, create_access_token
+from permissions            import can_read_own_profile, can_update_own_profile, can_delete_own_profile
 
 common_router = APIRouter()
 
@@ -20,3 +22,11 @@ async def root():
 @common_router.get('/mock')
 async def mock_view():
     return {'message': 'OK'}
+
+@common_router.get('/my/profile', response_model=ReadProfile, tags=['My'])
+async def get_profile(session: AsyncSession = Depends(get_session), user = Depends(get_current_user)):
+    result = await session.execute(
+        select(User).where(User.user_id == user.user_id)
+    )
+    profile = result.scalar_one_or_none()
+    return profile

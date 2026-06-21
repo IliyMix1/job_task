@@ -43,3 +43,8 @@ class PermissionChecker():
             raise HTTPException(status_code=403, detail='Forbidden')
         
         return user
+    
+#Сразу создаём стандартные объекты, чтобы выполнять проверку роли
+can_read_own_profile   = PermissionChecker(resource_name='profile', permission_name='can_read_own')
+can_update_own_profile = PermissionChecker(resource_name='profile', permission_name='can_update_own')
+can_delete_own_profile = PermissionChecker(resource_name='profile', permission_name='can_delete_own')

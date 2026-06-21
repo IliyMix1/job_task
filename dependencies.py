@@ -16,6 +16,8 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(s
         #Расшифровываем jwt-токен и достаёт оттуда id
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         user_id = payload.get("sub")
+        #Из токена id достаётся как строка, во избежание конфликтов переводим в int
+        user_id = int(user_id)
 
         if user_id is None:
             raise HTTPException(status_code=401, detail='Authentication required')
@@ -30,4 +32,5 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(s
     if not user.is_active:
         raise HTTPException(status_code=403, detail='Account was deleted') 
 
+    return user
     #return await select_record(id=int(user_id), model=User, session=session)

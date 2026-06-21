@@ -29,3 +29,11 @@ class AuthCreateAccount(BaseModel):
 class AuthLogin(BaseModel):
     email:    str = Field(min_length=1, max_length=320)
     password: str = Field(min_length=8, max_length=70)
+
+
+class ReadProfile(BaseModel):
+    first_name:   str
+    last_name:    str 
+    patronymic:   str | None
+    email:        str
+    phone_number: str | None
