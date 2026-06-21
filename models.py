@@ -70,3 +70,10 @@ class Access_rule(Base):
     #Описываем связи между таблицами
     role:     Mapped['Role']     = relationship('Role',     back_populates='access_rules') 
     resource: Mapped['Resource'] = relationship('Resource', back_populates='access_rules')
+
+
+class TokenBlacklist(Base):
+    __tablename__ = 'token_blacklist'
+
+    jti:        Mapped[str]      = mapped_column(Text, primary_key=True)
+    expires_at: Mapped[datetime] = mapped_column(DateTime, nullable=False)

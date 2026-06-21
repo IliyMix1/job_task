@@ -1,14 +1,17 @@
 #Для эндпоинтов
 from fastapi                import APIRouter, Depends, HTTPException
-from schemas                import AuthReg, AuthCreateAccount, AuthLogin
+from schemas                import AuthReg, AuthCreateAccount, AuthLogin, AuthLogout
 #Для интеграции с PostgreSQL
 from sqlalchemy.ext.asyncio import AsyncSession
 #from sqlalchemy.orm         import joinedload
 from sqlalchemy             import select
 from database               import get_session, create_record
-from models                 import User, Role
+from models                 import User, Role, TokenBlacklist
+from dependencies           import get_current_user, HTTPAuthorizationCredentials, security, jwt, SECRET_KEY, ALGORITHM
 
 from auth                   import verify_password, hash_password, create_access_token
+
+from datetime import datetime
 
 auth_router = APIRouter(prefix='/auth', tags=['Auth'])
 
@@ -69,3 +72,23 @@ async def login(schema: AuthLogin, session: AsyncSession = Depends(get_session))
 
     token = create_access_token({'sub': str(user.user_id)})
     return {'access_token': token, 'token_type': 'bearer'}
+
+@auth_router.post('/logout')
+async def logout(credentials: HTTPAuthorizationCredentials = Depends(security), user = Depends(get_current_user), session: AsyncSession = Depends(get_session)):
+    #Повторно получаем токен и достаём оттуда его id и "срок годности"
+    token = credentials.credentials
+    payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+    
+    jti = payload.get('jti')
+    exp = payload.get('exp')
+
+    #Дата хранится в токене в другом формате, переводим в datetime
+    expires_at = datetime.fromtimestamp(exp)
+
+    data = AuthLogout(
+        jti=jti,
+        expires_at=expires_at,
+    )
+
+    await create_record(model=TokenBlacklist, schema=data, session=session)
+    return {'message': 'Logout is successful'}

@@ -2,6 +2,7 @@ from fastapi.security import HTTPBearer
 from datetime import datetime, timedelta
 from jose     import jwt, JWTError
 from dotenv   import load_dotenv
+from uuid     import uuid4
 import bcrypt
 import os
 
@@ -29,5 +30,8 @@ def create_access_token(data: dict) -> str:
     payload = data.copy()
     #Добавляем "срок годности"
     payload['exp'] = datetime.now() +timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    #Добавляем уникальный id для токена(JTI = JWT ID)
+    payload['jti'] = str(uuid4())
+
     #Возвращаем JWT-токен
     return jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)

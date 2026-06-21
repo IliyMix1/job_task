@@ -1,6 +1,6 @@
 from typing import Literal
 from pydantic import BaseModel, field_validator, Field, model_validator
-from datetime import date
+from datetime import datetime
 
 
 class AuthReg(BaseModel):
@@ -29,6 +29,10 @@ class AuthCreateAccount(BaseModel):
 class AuthLogin(BaseModel):
     email:    str = Field(min_length=1, max_length=320)
     password: str = Field(min_length=8, max_length=70)
+
+class AuthLogout(BaseModel):
+    jti:        str
+    expires_at: datetime
 
 
 class ReadProfile(BaseModel):
