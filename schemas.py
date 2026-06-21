@@ -36,6 +36,7 @@ class AuthLogout(BaseModel):
 
 
 class ReadProfile(BaseModel):
+    role_id:      int
     first_name:   str
     last_name:    str 
     patronymic:   str | None

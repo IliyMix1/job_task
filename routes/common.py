@@ -10,7 +10,7 @@ from models                 import User
 from dependencies           import get_current_user
 
 from auth                   import verify_password, hash_password, create_access_token
-from permissions            import can_read_own_profile, can_update_own_profile, can_delete_own_profile
+from permissions            import can_read_own_profile, can_update_own_profile, can_delete_own_profile, can_read_all_products, can_create_products, can_read_all_users, can_update_all_users
 
 common_router = APIRouter()
 
@@ -40,3 +40,25 @@ async def delete_profile(session: AsyncSession = Depends(get_session), user = De
     user.is_active = False
     await session.commit()
     return {'message': 'Account was successfully deleted'}
+
+
+# @common_router.get('/mock/products', tags=['Mock'])
+# async def get_products(user = Depends(can_read_all_products), session: AsyncSession = Depends(get_session)):
+#     pass
+
+# @common_router.post('/mock/products', tags=['Mock'])
+# async def post_product(user = Depends(can_create_products), session: AsyncSession = Depends(get_session)):
+#     pass
+
+
+@common_router.get('/admin/users', response_model=list[ReadProfile], tags=['Admin'])
+async def read_all_users(user = Depends(can_read_all_users), session: AsyncSession = Depends(get_session)):
+    result = await session.execute(
+        select(User)
+    )
+    users = result.scalars().all()
+    return users
+
+@common_router.patch('/admin/users/{user_id}', tags=['Admin'])
+async def patch_user(user_id: int, user = Depends(get_current_user), session: AsyncSession = Depends(get_session)):
+    pass

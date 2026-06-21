@@ -21,6 +21,7 @@ RESOURCES = (
     )
 
 ACCESS_RULES = (
+    #ВСЕ ПОЛЬЗОВАТЕЛИ
     {
         'role':     'admin',
         'resource': 'users',
@@ -32,6 +33,7 @@ ACCESS_RULES = (
         'can_delete_own': True,
         'can_delete_all': True
     },
+    #ПРОФИЛЬ
     {
         'role':     'user',
         'resource': 'profile',
@@ -42,7 +44,30 @@ ACCESS_RULES = (
         'can_update_all': False,
         'can_delete_own': True,
         'can_delete_all': False
-    }
+    },
+    #ПРОДУКТЫ
+    {
+        'role':     'admin',
+        'resource': 'products',
+        'can_create':     True,
+        'can_read_own':   True,
+        'can_read_all':   True,
+        'can_update_own': True,
+        'can_update_all': True,
+        'can_delete_own': True,
+        'can_delete_all': True
+    },
+    {
+        'role':     'user',
+        'resource': 'products',
+        'can_create':     False,
+        'can_read_own':   True,
+        'can_read_all':   True,
+        'can_update_own': False,
+        'can_update_all': False,
+        'can_delete_own': False,
+        'can_delete_all': False
+    },
 )
 
 
