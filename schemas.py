@@ -49,3 +49,11 @@ class PatchProfile(BaseModel):
     patronymic:   str | None = None
     email:        str | None = None
     phone_number: str | None = None
+
+class AdminPatchUser(BaseModel):
+    role_id:      int | None = None
+    first_name:   str | None = None
+    last_name:    str | None = None 
+    patronymic:   str | None = None
+    email:        str | None = None
+    phone_number: str | None = None

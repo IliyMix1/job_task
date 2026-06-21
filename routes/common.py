@@ -1,6 +1,6 @@
 #Для эндпоинтов
 from fastapi                import APIRouter, Depends, HTTPException
-from schemas                import AuthReg, AuthLogin, ReadProfile, PatchProfile
+from schemas                import AuthReg, AuthLogin, ReadProfile, PatchProfile, AdminPatchUser
 #Для интеграции с PostgreSQL
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm         import joinedload
@@ -52,13 +52,13 @@ async def delete_profile(session: AsyncSession = Depends(get_session), user = De
 
 
 @common_router.get('/admin/users', response_model=list[ReadProfile], tags=['Admin'])
-async def read_all_users(user = Depends(can_read_all_users), session: AsyncSession = Depends(get_session)):
+async def get_all_users(user = Depends(can_read_all_users), session: AsyncSession = Depends(get_session)):
     result = await session.execute(
         select(User)
     )
     users = result.scalars().all()
     return users
 
-@common_router.patch('/admin/users/{user_id}', tags=['Admin'])
-async def patch_user(user_id: int, user = Depends(get_current_user), session: AsyncSession = Depends(get_session)):
-    pass
+@common_router.patch('/admin/users/{user_id}', response_model=ReadProfile, tags=['Admin'])
+async def patch_user(user_id: int, schema: AdminPatchUser, user = Depends(can_update_all_users), session: AsyncSession = Depends(get_session)):
+    return await patch_record(id=user_id, model=User, schema=schema, session=session)
