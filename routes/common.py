@@ -1,11 +1,11 @@
 #Для эндпоинтов
 from fastapi                import APIRouter, Depends, HTTPException
-from schemas                import AuthReg, AuthLogin, ReadProfile
+from schemas                import AuthReg, AuthLogin, ReadProfile, PatchProfile
 #Для интеграции с PostgreSQL
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm         import joinedload
 from sqlalchemy             import select
-from database               import get_session, create_record
+from database               import get_session, create_record, patch_record
 from models                 import User
 from dependencies           import get_current_user
 
@@ -30,3 +30,7 @@ async def get_profile(session: AsyncSession = Depends(get_session), user = Depen
     )
     profile = result.scalar_one_or_none()
     return profile
+
+@common_router.patch('/my/profile', response_model=ReadProfile, tags=['My'])
+async def patch_profile(schema: PatchProfile, session: AsyncSession = Depends(get_session), user = Depends(get_current_user)):
+    return await patch_record(id=user.user_id, model=User, schema=schema, session=session)

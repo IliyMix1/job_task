@@ -37,3 +37,10 @@ class ReadProfile(BaseModel):
     patronymic:   str | None
     email:        str
     phone_number: str | None
+
+class PatchProfile(BaseModel):
+    first_name:   str | None = None
+    last_name:    str | None = None 
+    patronymic:   str | None = None
+    email:        str | None = None
+    phone_number: str | None = None
