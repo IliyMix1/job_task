@@ -55,3 +55,8 @@ can_create_products    = PermissionChecker(resource_name='products', permission_
 can_read_all_users     = PermissionChecker(resource_name='users', permission_name='can_read_all')
 can_update_all_users   = PermissionChecker(resource_name='users', permission_name='can_update_all')
 can_delete_all_users   = PermissionChecker(resource_name='users', permission_name='can_delete_all')
+
+can_create_access_rules= PermissionChecker(resource_name='access_rules', permission_name='can_create')
+can_read_access_rules  = PermissionChecker(resource_name='access_rules', permission_name='can_read_all')
+can_update_access_rules= PermissionChecker(resource_name='access_rules', permission_name='can_update_all')
+can_delete_access_rules= PermissionChecker(resource_name='access_rules', permission_name='can_delete_all')

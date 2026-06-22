@@ -67,3 +67,28 @@ class AdminReadUser(BaseModel):
     email:        str
     phone_number: str | None
     is_active:    bool
+
+class AdminCreateAccessRule(BaseModel):
+    role_id:        int
+    resource_id:    int
+    can_create:     bool
+    can_read_own:   bool
+    can_read_all:   bool
+    can_update_own: bool
+    can_update_all: bool
+    can_delete_own: bool
+    can_delete_all: bool
+
+class AdminReadAccessRule(AdminCreateAccessRule):
+    pass
+
+class AdminPatchAccessRule(BaseModel):
+    role_id:        int  | None = None
+    resource_id:    int  | None = None
+    can_create:     bool | None = None
+    can_read_own:   bool | None = None
+    can_read_all:   bool | None = None
+    can_update_own: bool | None = None
+    can_update_all: bool | None = None
+    can_delete_own: bool | None = None
+    can_delete_all: bool | None = None

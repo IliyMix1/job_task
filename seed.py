@@ -17,7 +17,8 @@ ROLES = (
 RESOURCES = (
     {'resource_name': 'users'}, 
     {'resource_name': 'profile'}, 
-    {'resource_name': 'products'}
+    {'resource_name': 'products'},
+    {'resource_name': 'access_rules'}
     )
 
 ACCESS_RULES = (
@@ -74,6 +75,29 @@ ACCESS_RULES = (
         'can_create':     False,
         'can_read_own':   True,
         'can_read_all':   True,
+        'can_update_own': False,
+        'can_update_all': False,
+        'can_delete_own': False,
+        'can_delete_all': False
+    },
+    #ПРАВИЛА ДОСТУПА
+    {
+        'role':     'admin',
+        'resource': 'access_rules',
+        'can_create':     True,
+        'can_read_own':   True,
+        'can_read_all':   True,
+        'can_update_own': True,
+        'can_update_all': True,
+        'can_delete_own': True,
+        'can_delete_all': True
+    },
+    {
+        'role':     'user',
+        'resource': 'access_rules',
+        'can_create':     False,
+        'can_read_own':   False,
+        'can_read_all':   False,
         'can_update_own': False,
         'can_update_all': False,
         'can_delete_own': False,
