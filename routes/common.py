@@ -1,16 +1,16 @@
 #Для эндпоинтов
 from fastapi                import APIRouter, Depends, HTTPException
-from schemas                import AuthReg, AuthLogin, ReadProfile, PatchProfile, AdminPatchUser, AdminReadUser, AdminReadAccessRule, AdminCreateAccessRule, AdminPatchAccessRule
+from schemas                import AuthReg, AuthLogin, ReadProfile, PatchProfile, AdminPatchUser, AdminReadUser, AdminReadAccessRule, AdminCreateAccessRule, AdminPatchAccessRule, ProductCreate, ProductRead, ProductPatch
 #Для интеграции с PostgreSQL
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm         import joinedload
 from sqlalchemy             import select
 from database               import get_session, create_record, patch_record
-from models                 import User, Access_rule
+from models                 import User, Access_rule, Product
 from dependencies           import get_current_user
 
 from auth                   import verify_password, hash_password, create_access_token
-from permissions            import can_read_own_profile, can_update_own_profile, can_delete_own_profile, can_read_all_products, can_create_products, can_read_all_users, can_update_all_users, can_delete_all_users, can_read_access_rules, can_create_access_rules, can_update_access_rules, can_delete_access_rules
+from permissions            import can_read_own_profile, can_update_own_profile, can_delete_own_profile, can_read_all_products, can_create_products, can_update_all_products, can_delete_all_products, can_read_all_users, can_update_all_users, can_delete_all_users, can_read_access_rules, can_create_access_rules, can_update_access_rules, can_delete_access_rules
 
 common_router = APIRouter()
 
@@ -40,15 +40,6 @@ async def delete_profile(session: AsyncSession = Depends(get_session), user = De
     user.is_active = False
     await session.commit()
     return {'message': 'Account was successfully deleted'}
-
-
-# @common_router.get('/mock/products', tags=['Mock'])
-# async def get_products(user = Depends(can_read_all_products), session: AsyncSession = Depends(get_session)):
-#     pass
-
-# @common_router.post('/mock/products', tags=['Mock'])
-# async def post_product(user = Depends(can_create_products), session: AsyncSession = Depends(get_session)):
-#     pass
 
 
 @common_router.get('/admin/users', response_model=list[AdminReadUser], tags=['Admin'])
@@ -116,3 +107,32 @@ async def delete_access_rule(role_id: int, resource_id: int, admin = Depends(can
     await session.delete(record)
     await session.commit()
     return {'message': 'Access-rule was successfully deleted'}
+
+
+@common_router.get('/products', response_model=list[ProductRead], tags=['Products'])
+async def get_all_products(user = Depends(can_read_all_products), session: AsyncSession = Depends(get_session)):
+    result = await session.execute(
+        select(Product)
+    )
+    return result.scalars().all()
+
+@common_router.post('/products', response_model=ProductRead, tags=['Products'])
+async def create_product(schema: ProductCreate, user = Depends(can_create_products), session: AsyncSession = Depends(get_session)):
+    return await create_record(model=Product, schema=schema, session=session) 
+
+@common_router.patch('/products/{product_id}', response_model=ProductRead, tags=['Products'])
+async def patch_product(product_id: int, schema: ProductPatch, user = Depends(can_update_all_products), session: AsyncSession = Depends(get_session)):
+    return await patch_record(id=product_id, model=Product, schema=schema, session=session)
+
+@common_router.delete('/products/{product_id}', tags=['Products'])
+async def delete_product(product_id: int, user = Depends(can_delete_all_products), session: AsyncSession = Depends(get_session)):
+    result = await session.execute(
+        select(Product).where(Product.product_id == product_id)
+    )
+    product = result.scalar_one_or_none()
+    if product is None:
+        raise HTTPException(status_code=404, detail='Product not found')
+    
+    await session.delete(product)
+    await session.commit()
+    return {'message': 'Product was successfully deleted'}

@@ -92,3 +92,15 @@ class AdminPatchAccessRule(BaseModel):
     can_update_all: bool | None = None
     can_delete_own: bool | None = None
     can_delete_all: bool | None = None
+
+
+class ProductCreate(BaseModel):
+    product_name: str
+    price:        int
+
+class ProductRead(ProductCreate):
+    product_id: int
+
+class ProductPatch(BaseModel):
+    product_name: str | None = None
+    price:        int | None = None

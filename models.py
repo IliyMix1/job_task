@@ -77,3 +77,11 @@ class TokenBlacklist(Base):
 
     jti:        Mapped[str]      = mapped_column(Text, primary_key=True)
     expires_at: Mapped[datetime] = mapped_column(DateTime, nullable=False)
+
+
+class Product(Base):
+    __tablename__ = 'products'
+
+    product_id:   Mapped[int] = mapped_column(BigInteger, primary_key=True, autoincrement=True)
+    product_name: Mapped[str] = mapped_column(Text, nullable=False)
+    price:        Mapped[int] = mapped_column(BigInteger, nullable=False)
