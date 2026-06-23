@@ -82,6 +82,16 @@ async def logout(credentials: HTTPAuthorizationCredentials = Depends(security), 
     jti = payload.get('jti')
     exp = payload.get('exp')
 
+    if jti is None or exp is None:
+        raise HTTPException(status_code=401, detail='Invalid token')
+
+    result = await session.execute(
+        select(TokenBlacklist).where(TokenBlacklist.jti == jti)
+    )
+    record = result.scalar_one_or_none()
+    if record is not None:
+        return {'message': 'Token already logged out'}
+
     #Дата хранится в токене в другом формате, переводим в datetime
     expires_at = datetime.fromtimestamp(exp)
 

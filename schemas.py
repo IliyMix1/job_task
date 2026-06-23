@@ -83,8 +83,6 @@ class AdminReadAccessRule(AdminCreateAccessRule):
     pass
 
 class AdminPatchAccessRule(BaseModel):
-    role_id:        int  | None = None
-    resource_id:    int  | None = None
     can_create:     bool | None = None
     can_read_own:   bool | None = None
     can_read_all:   bool | None = None

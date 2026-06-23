@@ -122,6 +122,13 @@ async def create_product(schema: ProductCreate, user = Depends(can_create_produc
 
 @common_router.patch('/products/{product_id}', response_model=ProductRead, tags=['Products'])
 async def patch_product(product_id: int, schema: ProductPatch, user = Depends(can_update_all_products), session: AsyncSession = Depends(get_session)):
+    result = await session.execute(
+        select(Product).where(Product.product_id == product_id)
+    )
+    record = result.scalar_one_or_none()
+    if record is None:
+        raise HTTPException(status_code=404, detail='Product not found')
+
     return await patch_record(id=product_id, model=Product, schema=schema, session=session)
 
 @common_router.delete('/products/{product_id}', tags=['Products'])
